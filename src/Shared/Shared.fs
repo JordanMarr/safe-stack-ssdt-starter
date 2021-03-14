@@ -4,7 +4,8 @@ open System
 
 type Todo =
     { Id : Guid
-      Description : string }
+      Description : string
+      IsDone : bool }
 
 module Todo =
     let isValid (description: string) =
@@ -12,7 +13,8 @@ module Todo =
 
     let create (description: string) =
         { Id = Guid.NewGuid()
-          Description = description }
+          Description = description
+          IsDone = false }
 
 module Route =
     let builder typeName methodName =
@@ -20,4 +22,5 @@ module Route =
 
 type ITodosApi =
     { getTodos : unit -> Async<Todo list>
-      addTodo : Todo -> Async<Todo> }
+      addTodo : Todo -> Async<Todo>
+      updateTodo : Todo -> Async<Todo> }

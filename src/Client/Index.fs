@@ -13,6 +13,8 @@ type Msg =
     | SetInput of string
     | AddTodo
     | AddedTodo of Todo
+    | ToggleIsDone of Todo
+    | UpdatedTodo of Todo
 
 let todosApi =
     Remoting.createApi()
@@ -38,6 +40,17 @@ let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
         { model with Input = "" }, cmd
     | AddedTodo todo ->
         { model with Todos = model.Todos @ [ todo ] }, Cmd.none
+    | ToggleIsDone todo ->
+        let toggled = { todo with IsDone = not todo.IsDone }        
+        model, Cmd.OfAsync.perform todosApi.updateTodo toggled UpdatedTodo
+    | UpdatedTodo todo -> 
+        { model with 
+            Todos = 
+                model.Todos
+                |> List.map (fun t -> 
+                    if t.Id = todo.Id then todo else t
+                )
+        }, Cmd.none
 
 open Feliz
 open Feliz.Bulma
@@ -61,7 +74,14 @@ let containerBox (model : Model) (dispatch : Msg -> unit) =
         Bulma.content [
             Html.ol [
                 for todo in model.Todos do
-                    Html.li [ prop.text todo.Description ]
+                    Html.li [                         
+                        prop.onClick (fun e -> dispatch (ToggleIsDone todo))
+                        prop.text todo.Description 
+                        prop.style [
+                            if todo.IsDone then style.textDecoration textDecorationLine.lineThrough
+                            style.cursor "pointer"
+                        ]
+                    ]
             ]
         ]
         Bulma.field.div [

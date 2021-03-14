@@ -10,7 +10,8 @@ open Microsoft.AspNetCore.Http
 let todosApi =
     let db = Database.createContext @"Data Source=.\SQLEXPRESS;Initial Catalog=SafeTodo;Integrated Security=SSPI;"
     { getTodos = fun () -> TodoController.getTodos db
-      addTodo = TodoController.addTodo db }
+      addTodo = TodoController.addTodo db
+      updateTodo = TodoController.updateTodo db }
 
 let fableRemotingErrorHandler (ex: Exception) (ri: RouteInfo<HttpContext>) = 
     printfn "ERROR: %s" ex.Message
